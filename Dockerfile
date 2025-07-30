@@ -1,65 +1,32 @@
-# Use uma imagem base do Node.js
-FROM node:18-slim
+# Passo 1: Usar uma base Node.js completa para melhor compatibilidade
+FROM node:18
 
-# Linha para forçar a atualização do cache. Mude se o erro persistir.
-ARG CACHE_BUSTER=2025-07-30T07:36:00
+# Passo 2: Definir variáveis de ambiente para o Puppeteer
+# Diz para o Puppeteer não baixar sua própria versão do Chrome
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Instale as dependências do sistema necessárias para o Puppeteer (usado pelo WPPConnect)
-RUN apt-get update && apt-get install -y \
-    gconf-service \
-    libasound2 \
-    libatk1.0-0 \
-    libc6 \
-    libcairo2 \
-    libcups2 \
-    libdbus-1-3 \
-    libexpat1 \
-    libfontconfig1 \
-    libgcc1 \
-    libgconf-2-4 \
-    libgdk-pixbuf2.0-0 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libstdc++6 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrandr2 \
-    libxrender1 \
+# Passo 3: Instalar o Chromium e todas as suas dependências do sistema
+# Esta é a forma mais garantida de ter um ambiente funcional
+RUN apt-get update \
+    && apt-get install -y \
+    chromium \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-kacst \
+    fonts-freefont-ttf \
     libxss1 \
-    libxtst6 \
-    ca-certificates \
-    fonts-liberation \
-    libappindicator1 \
-    libnss3 \
-    lsb-release \
-    xdg-utils \
-    wget \
-    --no-install-recommends
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
-# Defina o diretório de trabalho dentro do contêiner
+# Passo 4: Continuar com a configuração da aplicação
 WORKDIR /usr/src/app
 
-# Copie os arquivos de dependência
 COPY package*.json ./
 
-# Instale as dependências do Node.js
 RUN npm install
 
-# Copie o restante dos arquivos da aplicação
 COPY . .
 
-# Exponha a porta que o WPPConnect Server utiliza
-EXPOSE 21465
-
-# Comando para iniciar a aplicação
 CMD ["npm", "start"]
