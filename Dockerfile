@@ -1,13 +1,12 @@
 # Passo 1: Usar uma base Node.js completa para melhor compatibilidade
 FROM node:18
 
-# Passo 2: Definir variáveis de ambiente para o Puppeteer
+# Passo 2: Definir variáveis de ambiente para o Puppeteer (AGORA CORRIGIDO)
 # Diz para o Puppeteer não baixar sua própria versão do Chrome
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Passo 3: Instalar o Chromium e todas as suas dependências do sistema
-# Esta é a forma mais garantida de ter um ambiente funcional
 RUN apt-get update \
     && apt-get install -y \
     chromium \
