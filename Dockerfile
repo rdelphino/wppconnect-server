@@ -1,30 +1,21 @@
-# Passo 1: Usar uma base Node.js completa para melhor compatibilidade
+# Usar a base Node.js completa
 FROM node:18
 
-# Passo 2: Definir variáveis de ambiente para o Puppeteer (AGORA CORRIGIDO)
-# Diz para o Puppeteer não baixar sua própria versão do Chrome
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Definir o caminho do executável para o WPPConnect usar em tempo de execução
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Passo 3: Instalar o Chromium e todas as suas dependências do sistema
-RUN apt-get update \
-    && apt-get install -y \
-    chromium \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-thai-tlwg \
-    fonts-kacst \
-    fonts-freefont-ttf \
-    libxss1 \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar o Chromium e suas dependências. O próprio pacote do Chromium
+# já inclui as bibliotecas necessárias como libnspr4.
+RUN apt-get update && apt-get install -y chromium --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Passo 4: Continuar com a configuração da aplicação
+# Configurar a aplicação
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+# Instalar as dependências do Node, passando a instrução para pular o download
+# diretamente na linha de comando para garantir que seja executada.
+RUN PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
 
 COPY . .
 
