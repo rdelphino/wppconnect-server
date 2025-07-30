@@ -1,6 +1,9 @@
 # Use uma imagem base do Node.js
 FROM node:18-slim
 
+# Linha para forçar a atualização do cache. Mude se o erro persistir.
+ARG CACHE_BUSTER=2025-07-30T07:36:00
+
 # Instale as dependências do sistema necessárias para o Puppeteer (usado pelo WPPConnect)
 RUN apt-get update && apt-get install -y \
     gconf-service \
